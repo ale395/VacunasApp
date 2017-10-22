@@ -1,9 +1,11 @@
 package com.vacunasdomaincompany.vacunasapp;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,8 +21,10 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.bumptech.glide.*;
 import com.google.android.gms.common.api.Status;
+import com.vacunasdomaincompany.vacunasapp.objetos.web.service.Usuario;
 
-import org.w3c.dom.Text;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -28,11 +32,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private TextView nameTextView;
     private TextView emailTexView;
     private TextView idTextView;
+    private Usuario usuario = null;
 
     private GoogleApiClient googleApiClient;
 
     public static final String NOT_LOG_OUT = "No se pudo cerrar sesión";
     public static final String NOT_REVOKE = "No se pudo revocar el acceso";
+    public static final String ipServer = "192.168.43.3";
+    public static final String portServer = "8080";
+    public static final String dirWebServerUsuario = "/control_vacunas_web_service/webresources/pkg_entidad.usuario/usuario/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +69,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(googleApiClient);
         if (opr.isDone()) {
             GoogleSignInResult result = opr.get();
-            handleSignInResult(result);
+            if (validarUsuario(result)){
+                handleSignInResult(result);
+            }else{
+                Toast.makeText(getApplicationContext(), "Usuario no registrado!", Toast.LENGTH_SHORT).show();
+                goLogInScreen();
+            }
         } else {
             opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
                 @Override
@@ -75,12 +88,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             GoogleSignInAccount account = result.getSignInAccount();
-
             nameTextView.setText(account.getDisplayName());
             emailTexView.setText(account.getEmail());
-            idTextView.setText(account.getId());
             Glide.with(this).load(account.getPhotoUrl()).into(photoImageView);
-
         } else {
             goLogInScreen();
         }
@@ -105,21 +115,60 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         });
     }
 
-    public void Revoke(View view) {
-        Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(new ResultCallback<Status>() {
-            @Override
-            public void onResult(@NonNull Status status) {
-                if (status.isSuccess()) {
-                    goLogInScreen();
-                } else {
-                    Toast.makeText(getApplicationContext(), NOT_REVOKE, Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
+    public boolean validarUsuario(GoogleSignInResult result){
+        if (result.isSuccess()) {
+            GoogleSignInAccount account = result.getSignInAccount();
+            String email = account.getEmail();
+            pedirDatos("http://"+ipServer+":"+portServer+dirWebServerUsuario+email);
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    public void pedirDatos(String uri){
+        MyAsynTask task = new MyAsynTask();
+        task.execute(uri);
+        //Log.e("GET_USER:", task.getUser().toString());
+    }
+
+    private class MyAsynTask extends AsyncTask<String, String, String> {
+        private Usuario user = null;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String content = HttpManager.getData(params[0]);
+            this.user = HttpManager.getUsuario(params[0]);
+            //Log.e("GET_USER", this.user.toString());
+            return content;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (s == null){
+                Toast.makeText(getApplicationContext(), "El usuario no esta registrado en la base de datos!", Toast.LENGTH_SHORT).show();
+                goLogInScreen();
+            }
+        }
+
+        public Usuario getUser(){
+            return this.user;
+        }
+    }
+
+    public void cargarDatos(String dato){
+        idTextView.append(dato + "\n");
+    }
+
 }
