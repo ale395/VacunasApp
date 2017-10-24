@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">VacunasApp</string>
+    <string name="log_out">Cerrar Sesión</string>
+    <string name="Revoke">Revocar Acceso</string>
+</resources>

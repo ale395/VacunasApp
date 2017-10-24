@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1061923909187",
+    "firebase_url": "https://vacunasapp.firebaseio.com",
+    "project_id": "vacunasapp",
+    "storage_bucket": "vacunasapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1061923909187:android:9d110251fb4f73f3",
+        "android_client_info": {
+          "package_name": "com.vacunasdomaincompany.vacunasapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1061923909187-jsmsudvb37uf1c81mt53jb7fvrbq87t3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vacunasdomaincompany.vacunasapp",
+            "certificate_hash": "6f98d05f45493d69fb0f9e70fbd3abd92dd29765"
+          }
+        },
+        {
+          "client_id": "1061923909187-nnrv20eff73nqo3fnupu99t2a0jvvn81.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB84xhnIj_utCnDm7nS-5HpFlx8PqEPmVQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1061923909187-nnrv20eff73nqo3fnupu99t2a0jvvn81.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
